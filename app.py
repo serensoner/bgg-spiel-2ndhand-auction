@@ -38,5 +38,5 @@ def job1():
 
 
 if __name__ == '__main__':
-    GeeklistScraper(os.getenv('AUCTION_ID'), force_scrape=True)
+    # GeeklistScraper(os.getenv('AUCTION_ID'), force_scrape=True)
     app.run(host='0.0.0.0', port=8080)

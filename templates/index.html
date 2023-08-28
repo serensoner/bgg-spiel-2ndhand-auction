@@ -74,7 +74,6 @@ tr.strikeout td:before {
 <script type="text/javascript">
 
 function format(d) {
-    // `d` is the original data object for the row
     return (
         '<dl><dd>' + d.body_text + '</dd><dt>Comments</dt><dd>' + d.comments_json.join('<br />') + '</dd></dl>'
     );
@@ -141,6 +140,7 @@ var table = new DataTable('#table', {
                 // Create input element
                 let input = document.createElement('input');
                 input.placeholder = title;
+                input.className = "form-control";
                 column.header().replaceChildren(input);
 
                 // Event listener for user input
