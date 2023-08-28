@@ -19,4 +19,4 @@ RUN echo $TZ > /etc/timezone \
 
 COPY . /app
 
-CMD ["/app/app.py"]
+CMD ["python3", "/app/app.py"]

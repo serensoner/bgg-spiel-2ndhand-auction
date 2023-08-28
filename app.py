@@ -2,7 +2,7 @@ import json
 import os
 from flask_apscheduler import APScheduler
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 from GeeklistScraper import GeeklistScraper
 
@@ -16,9 +16,17 @@ def home():
 
 
 @app.route('/json')
-def serve_json():
+def serve_json(ids: str = None):
     with open(f'games_{AUCTION_ID}.json') as f:
-        return json.load(f)
+        games = json.load(f)
+    ids = request.args.get('ids', None)
+    if not ids:
+        return games
+
+    print('hello')
+
+    ids = ids.split(',')
+    return [g for g in games if g['id_'] in ids]
 
 
 scheduler = APScheduler()
