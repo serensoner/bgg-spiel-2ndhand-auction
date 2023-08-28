@@ -7,6 +7,7 @@ RUN apt-get update \
     && apt-get upgrade -yq \
     && apt-get install python3-pip -yq \
     && apt-get install tzdata locales -yq \
+    && apt-get install git -yq \
     && locale-gen en_US.UTF-8
 
 ENV AUCTION_ID=319184
