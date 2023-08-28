@@ -7,3 +7,4 @@ flask-cors
 git+https://github.com/serensoner/bgg-bbcode.git#egg=bbcode
 apscheduler
 dataclasses-json
+flask-apscheduler

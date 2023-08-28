@@ -1,6 +1,7 @@
 import os
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from apscheduler.jobstores.memory import MemoryJobStore
+from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from GeeklistScraper import GeeklistScraper
 
@@ -12,7 +13,7 @@ def scrape():
     GeeklistScraper(319184).parse_all()
 
 
-scheduler = BlockingScheduler(
+scheduler = BackgroundScheduler(
     executors={'default': ThreadPoolExecutor(32), 'processpool': ProcessPoolExecutor(5)},
     jobstores={'default': MemoryJobStore()},
     misfire_grace_time=5

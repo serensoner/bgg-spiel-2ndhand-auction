@@ -19,4 +19,4 @@ RUN echo $TZ > /etc/timezone \
 
 COPY . /app
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["/app/app.py"]
