@@ -11,6 +11,7 @@ RUN apt-get update \
     && locale-gen en_US.UTF-8
 
 ENV AUCTION_ID=319184
+EXPOSE 5000
 
 RUN echo $TZ > /etc/timezone \
     && dpkg-reconfigure -f noninteractive tzdata \
