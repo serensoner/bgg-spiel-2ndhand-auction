@@ -25,8 +25,8 @@ def serve_json(ids: str = None):
 
     print('hello')
 
-    ids = ids.split(',')
-    return [g for g in games if g['id_'] in ids]
+    ids = ids.split(';')
+    return [g for g in games if str(g['id_']) in ids]
 
 
 scheduler = APScheduler()

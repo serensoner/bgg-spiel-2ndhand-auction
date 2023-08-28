@@ -21,7 +21,7 @@ class GeeklistScraper:
         else:
             with open(self.filename, 'r+') as f:
                 entries: list[Entry] = json.load(f)
-                self.entries = {e['id_']: e for e in entries}
+                self.entries = {e['id_']: Entry.from_json(e) for e in entries}
 
     def parse_all(self):
         parsed = self.parse_geeklist()

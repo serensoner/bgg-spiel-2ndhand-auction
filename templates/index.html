@@ -1,14 +1,15 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Spiel 2023 no shipping auction tracker</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css"/>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
-  <style>
+    <style>
       td {
     position: relative;
     padding: 5px 10px;
@@ -22,40 +23,55 @@ tr.strikeout td:before {
     border-bottom: 1px solid #111;
     width: 100%;
 }
-  </style>
-  </head>
-  <body>
-    <h1 class="text-center">Spiel 2023 no shipping auction tracker</h1>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 
+.dataTables_filter { display: none; }
+
+    </style>
+</head>
+<body>
+<h1 class="text-center">Spiel 2023 no shipping auction tracker</h1>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
 
 
 <div class="container shadow min-vh-100 py-2">
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="form-check-sold">
+        <label class="form-check-label" for="form-check-sold">
+            Hide sold / deleted
+        </label>
+    </div>
+    <div class="form-check-2">
+        <input class="form-check-input" type="checkbox" value="" id="form-show-shortlist">
+        <label class="form-check-label" for="form-show-shortlist">
+            Show only shortlisted
+        </label>
+    </div>
     <div class="table-responsive">
         <table id="table" class="table accordion table-sm small" style="width: 100%">
             <thead>
-                <tr>
-                    <th></th>
-                    <th data-field="id_" scope="col">#</th>
-                    <th data-field="name" scope="col">Game</th>
-                    <th data-field="current" scope="col">Price</th>
-                    <th data-field="bin_price" scope="col">BIN</th>
-                    <th data-field="username" scope="col">Seller</th>
-                    <th data-field="max_bidder" scope="col">Winner</th>
-                    <th data-field="post_date_json" scope="col">Post Date</th>
-                    <th data-field="auction_end_json" scope="col">Auction End</th>
-                </tr>
+            <tr>
+                <th></th>
+                <th data-field="id_" scope="col">#</th>
+                <th data-field="name" scope="col">Game</th>
+                <th data-field="current" scope="col">Price</th>
+                <th data-field="bin_price" scope="col">BIN</th>
+                <th data-field="username" scope="col">Seller</th>
+                <th data-field="max_bidder" scope="col">Winner</th>
+                <th data-field="post_date_json" scope="col">Post Date</th>
+                <th data-field="auction_end_json" scope="col">Auction End</th>
+                <th>Shortlist</th>
+            </tr>
             </thead>
         </table>
     </div>
 </div>
 
 
-
-
-
-
-  <script type="text/javascript">
+</body>
+</html>
+<script type="text/javascript">
 
 function format(d) {
     // `d` is the original data object for the row
@@ -63,11 +79,14 @@ function format(d) {
         '<dl><dd>' + d.body_text + '</dd><dt>Comments</dt><dd>' + d.comments_json.join('<br />') + '</dd></dl>'
     );
 }
-let table = new DataTable('#table', {
+
+var url = '/json';
+var table = new DataTable('#table', {
+    select: true,
     order: [[7, 'desc']],
      pageLength: 50,
      lengthChange: false,
-     ajax: {url: '/json', dataSrc: ''},
+     ajax: {url: url, dataSrc: ''},
 
 "columnDefs": [ {
     "targets": 1,
@@ -75,6 +94,13 @@ let table = new DataTable('#table', {
     "data": "id_",
     "render": function ( data_, type, row, meta ) {
       return '<a target="_blank" href="https://boardgamegeek.com/geeklist/319184/essen-2023-no-shipping-auction-list-post-your-own?itemid='+data_+'#'+data_+'">'+data_+'</a>';
+    }
+  },{
+    "targets": 9,
+    "orderable": false,
+    "data": "id_",
+    "render": function ( data_, type, row, meta ) {
+      return '<input type="checkbox" name="day_name_selector[]" id="'+data_+'" value="'+data_+'"/>';
     }
   },
 ],
@@ -93,6 +119,12 @@ let table = new DataTable('#table', {
         { data: 'max_bidder' },
         { data: 'post_date_json', type: 'date' },
         { data: 'auction_end_json', type: 'date' },
+      {
+        data: 'id_',
+        className: 'dt-copy',
+            orderable: false,
+      },
+        { data: 'is_sold', visible: false },
     ],
 "rowCallback": function (row, data, index) {
                     if (data.is_sold) {
@@ -118,8 +150,19 @@ let table = new DataTable('#table', {
                     }
                 });
             });
+
     },
-});
+ });
+
+const hide_sold_checkbox = document.getElementById('form-check-sold')
+
+hide_sold_checkbox.addEventListener('change', (event) => {
+    if (event.currentTarget.checked) {
+        table.column(10).search(false).draw();
+    } else {
+        table.column(10).search('').draw();
+    }
+})
 
 
 // Add event listener for opening and closing details
@@ -137,9 +180,46 @@ table.on('click', 'td.dt-control', function (e) {
     }
 });
 
+const show_only_mine = document.getElementById('form-show-shortlist');
+show_only_mine.addEventListener('change', (event) => {
+    if (event.currentTarget.checked) {
+        var shortlist = localStorage.getItem('shortlist');
+        url = '/json?ids=' + shortlist;
+        table.ajax.url(url).load();
+    } else {
+        url = '/json'
+        table.ajax.url(url).load();
+    }
+})
 
-  </script>
 
 
-  </body>
-</html>
+
+table.on('click', 'td.dt-copy input', function (e) {
+    let tr = e.target.closest('tr');
+    let row = table.row(tr);
+    let input = e.target.closest('input');
+    let current_id = input.value;
+    var shortlist = localStorage.getItem('shortlist');
+    if (shortlist) {
+        var shortlisted_games = shortlist.split(';');
+    }
+    else {
+        var shortlisted_games = [];
+    }
+
+    if (input.checked) {
+        shortlisted_games.push(current_id);
+    } else {
+        for (var i = shortlisted_games.length - 1; i >= 0; i--) {
+            if (shortlisted_games[i] === current_id) {
+                shortlisted_games.splice(i, 1);
+            }
+        }
+    }
+
+    localStorage.setItem('shortlist', shortlisted_games.join(';'));
+    var shortlist = localStorage.getItem('shortlist');
+
+});
+</script>
