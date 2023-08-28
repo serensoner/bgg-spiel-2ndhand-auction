@@ -23,8 +23,6 @@ def serve_json(ids: str = None):
     if not ids:
         return games
 
-    print('hello')
-
     ids = ids.split(';')
     return [g for g in games if str(g['id_']) in ids]
 
@@ -36,8 +34,9 @@ scheduler.start()
 
 @scheduler.task('interval', id='scrape', seconds=300, misfire_grace_time=900)
 def job1():
-    GeeklistScraper(os.getenv('AUCTION_ID')).parse_all()
+    GeeklistScraper(os.getenv('AUCTION_ID'), force_scrape=True)
 
 
 if __name__ == '__main__':
+    GeeklistScraper(os.getenv('AUCTION_ID'), force_scrape=True)
     app.run(host='0.0.0.0', port=8080)
