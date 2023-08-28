@@ -1,6 +1,6 @@
 FROM python:3.11-slim
-WORKDIR /var/www/html
-COPY ./requirements.txt /var/www/html
+WORKDIR /app
+COPY ./requirements.txt /app
 
 # Updating and installing libs
 RUN apt-get update \
@@ -15,8 +15,8 @@ ENV AUCTION_ID=319184
 RUN echo $TZ > /etc/timezone \
     && dpkg-reconfigure -f noninteractive tzdata \
     && pip3 install Cython==0.29.21 \
-    && pip3 install -r /var/www/html/requirements.txt
+    && pip3 install -r /app/requirements.txt
 
-COPY . /var/www/html
+COPY . /app
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
