@@ -1,0 +1,9 @@
+requests
+xmltodict
+python-dateutil
+python-dotenv
+flask
+flask-cors
+git+https://github.com/serensoner/bgg-bbcode.git#egg=bbcode
+apscheduler
+dataclasses-json

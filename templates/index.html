@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Spiel 2023 no shipping auction tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+  <style>
+      td {
+    position: relative;
+    padding: 5px 10px;
+}
+
+tr.strikeout td:before {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    border-bottom: 1px solid #111;
+    width: 100%;
+}
+  </style>
+  </head>
+  <body>
+    <h1 class="text-center">Spiel 2023 no shipping auction tracker</h1>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
+
+
+<div class="container shadow min-vh-100 py-2">
+    <div class="table-responsive">
+        <table id="table" class="table accordion table-sm small" style="width: 100%">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th data-field="id_" scope="col">#</th>
+                    <th data-field="name" scope="col">Game</th>
+                    <th data-field="current" scope="col">Price</th>
+                    <th data-field="bin_price" scope="col">BIN</th>
+                    <th data-field="username" scope="col">Seller</th>
+                    <th data-field="max_bidder" scope="col">Winner</th>
+                    <th data-field="post_date_json" scope="col">Post Date</th>
+                    <th data-field="auction_end_json" scope="col">Auction End</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+
+  <script type="text/javascript">
+
+function format(d) {
+    // `d` is the original data object for the row
+    return (
+        '<dl><dd>' + d.body_text + '</dd><dt>Comments</dt><dd>' + d.comments_json.join('<br />') + '</dd></dl>'
+    );
+}
+let table = new DataTable('#table', {
+    order: [[7, 'desc']],
+     pageLength: 50,
+     lengthChange: false,
+     ajax: {url: '/json', dataSrc: ''},
+
+"columnDefs": [ {
+    "targets": 1,
+    "orderable": false,
+    "data": "id_",
+    "render": function ( data_, type, row, meta ) {
+      return '<a target="_blank" href="https://boardgamegeek.com/geeklist/319184/essen-2023-no-shipping-auction-list-post-your-own?itemid='+data_+'#'+data_+'">'+data_+'</a>';
+    }
+  },
+],
+        columns: [
+        {
+            className: 'dt-control',
+            orderable: false,
+            data: null,
+            defaultContent: ''
+        },
+        { data: 'id_' },
+        { data: 'name' },
+        { data: 'current' },
+        { data: 'bin_price' },
+        { data: 'username' },
+        { data: 'max_bidder' },
+        { data: 'post_date_json', type: 'date' },
+        { data: 'auction_end_json', type: 'date' },
+    ],
+"rowCallback": function (row, data, index) {
+                    if (data.is_sold) {
+                        $(row).addClass('table-secondary text-dark');
+                    }
+      },
+    initComplete: function () {
+        this.api()
+            .columns([2, 5, 6])
+            .every(function () {
+                let column = this;
+                let title = column.header().textContent;
+
+                // Create input element
+                let input = document.createElement('input');
+                input.placeholder = title;
+                column.header().replaceChildren(input);
+
+                // Event listener for user input
+                input.addEventListener('keyup', () => {
+                    if (column.search() !== this.value) {
+                        column.search(input.value).draw();
+                    }
+                });
+            });
+    },
+});
+
+
+// Add event listener for opening and closing details
+table.on('click', 'td.dt-control', function (e) {
+    let tr = e.target.closest('tr');
+    let row = table.row(tr);
+
+    if (row.child.isShown()) {
+        // This row is already open - close it
+        row.child.hide();
+    }
+    else {
+        // Open this row
+        row.child(format(row.data())).show();
+    }
+});
+
+
+  </script>
+
+
+  </body>
+</html>
