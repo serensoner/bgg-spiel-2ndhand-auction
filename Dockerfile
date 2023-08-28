@@ -19,4 +19,4 @@ RUN echo $TZ > /etc/timezone \
 
 COPY . /var/www/html
 
-ENTRYPOINT ["/docker_entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
