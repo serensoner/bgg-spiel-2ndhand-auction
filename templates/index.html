@@ -48,6 +48,12 @@ tr.strikeout td:before {
             Show only shortlisted
         </label>
     </div>
+    <div class="form-check-3">
+        <input class="form-check-input" type="checkbox" value="" id="form-show-todaytomorrow">
+        <label class="form-check-label" for="form-show-todaytomorrow">
+            Show ending today & tomorrow
+        </label>
+    </div>
     <div class="table-responsive">
         <table id="table" class="table accordion table-sm small" style="width: 100%">
             <thead>
@@ -124,9 +130,10 @@ var table = new DataTable('#table', {
             orderable: false,
       },
         { data: 'is_sold', visible: false },
+        { data: 'is_ended', visible: false },
     ],
 "rowCallback": function (row, data, index) {
-                    if (data.is_sold) {
+                    if ((data.is_sold) | (data.is_ended) ){
                         $(row).addClass('table-secondary text-dark');
                     }
       },
@@ -158,9 +165,9 @@ const hide_sold_checkbox = document.getElementById('form-check-sold')
 
 hide_sold_checkbox.addEventListener('change', (event) => {
     if (event.currentTarget.checked) {
-        table.column(10).search(false).draw();
+        table.column(10).search(false).column(11).search(false).draw();
     } else {
-        table.column(10).search('').draw();
+        table.column(10).search('').column(11).search('').draw();
     }
 })
 
@@ -185,6 +192,17 @@ show_only_mine.addEventListener('change', (event) => {
     if (event.currentTarget.checked) {
         var shortlist = localStorage.getItem('shortlist');
         url = '/json?ids=' + shortlist;
+        table.ajax.url(url).load();
+    } else {
+        url = '/json'
+        table.ajax.url(url).load();
+    }
+})
+
+const show_today_tomorrow = document.getElementById('form-show-todaytomorrow');
+show_today_tomorrow.addEventListener('change', (event) => {
+    if (event.currentTarget.checked) {
+        url = '/json?todaytomorrow=1';
         table.ajax.url(url).load();
     } else {
         url = '/json'

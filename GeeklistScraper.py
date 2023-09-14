@@ -72,7 +72,7 @@ class GeeklistScraper:
             'username': item_['@username'],
             'post_date': item_['@postdate'],
             'edit_date': item_['@editdate'],
-            'body': item_['body'],
+            'body_raw': item_['body'],
             'body_text': bbcode.render_html(item_['body']),
             'comments_raw': comments,
         }

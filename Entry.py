@@ -44,11 +44,12 @@ class Entry:
     username: str = field(repr=False)
     post_date: datetime | str = field(repr=False)
     edit_date: datetime | str = field(repr=False)
-    body: str = field(repr=False)
+    body_raw: str = field(repr=False)
     body_text: str
     post_date_json: str = None
     edit_date_json: str = None
     auction_end_json: str = None
+    body: str = field(default=None, repr=False)
     comments_raw: list[dict] = field(default=None, repr=False)
     language: str = ''
     condition: str = ''
@@ -70,7 +71,7 @@ class Entry:
     is_ended: bool = False
 
     def remove_strikethroughs(self):
-        self.body = remove_tag(self.body, '-')
+        self.body = remove_tag(self.body_raw, '-')
 
     def assign_field(self, field_name):
         groups = re.search(REGEXES[field_name], self.body, re.IGNORECASE)
@@ -78,6 +79,7 @@ class Entry:
             setattr(self, field_name, groups.group(1).strip())
 
     def __post_init__(self):
+        self.remove_strikethroughs()
         if not self.body or len(self.body) < 100:
             self.is_ended = True
 
@@ -101,7 +103,7 @@ class Entry:
             except ParserError:
                 self.auction_end = datetime(2099, 12, 31)
 
-            self.is_ended = self.auction_end < datetime.now()
+            self.is_ended = self.auction_end < datetime.now().today()
 
         if self.comments_raw:
             self.comments = [Comment(
