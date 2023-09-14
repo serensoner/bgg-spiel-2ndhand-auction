@@ -41,9 +41,10 @@ class GeeklistScraper:
                 entry.deleted = True
                 self.entries[k] = entry
 
+        entry_json = list(self.entries.values())
+        s = Entry.schema().dumps(entry_json, many=True)
+
         with open(self.filename, 'w+') as f:
-            entry_json = list(self.entries.values())
-            s = Entry.schema().dumps(entry_json, many=True)
             f.write(s)
 
         print('Finished scraping')
