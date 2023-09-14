@@ -109,7 +109,7 @@ class Entry:
             self.comments = [Comment(
                 username=c['@username'], date_str=c['@date'], postdate_str=c['@postdate'],
                 editdate_str=c['@editdate'], text=c.get('#text', ''),
-                text_render=bbcode.render_html(c.get('#text'), ''),
+                text_render=bbcode.render_html(c.get('#text', '')),
                 entry_username=self.username, entry_bin=self.bin_price
             ) for c in self.comments_raw]
             self.comments_json = [
