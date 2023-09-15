@@ -56,7 +56,8 @@ class GeeklistScraper:
         try:
             with open(self.filename, 'w+') as f:
                 f.write(s)
-        except:
+        except Exception as e:
+            log.error(e)
             self.write_to_file(s)
 
     def parse_geeklist(self) -> dict:
@@ -64,7 +65,7 @@ class GeeklistScraper:
         page = requests.get(url)
         if page.status_code == 202:
             time.sleep(10)
-            print(f'Sleeping... {self.geeklist_id}')
+            log.info(f'Sleeping... {self.geeklist_id}')
             return self.parse_geeklist()
         return xmltodict.parse(page.content)
 
