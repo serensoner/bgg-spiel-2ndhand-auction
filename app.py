@@ -19,6 +19,7 @@ def home():
 @app.route('/json')
 def serve_json(ids: str = None, todaytomorrow: bool = False):
     games = load_from_redis(f'games_{AUCTION_ID}')
+    games = json.loads(games)
 
     today_tomorrow = request.args.get('todaytomorrow', False)
     if today_tomorrow:
