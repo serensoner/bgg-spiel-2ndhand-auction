@@ -1,11 +1,13 @@
-import json
 import time
 import bbcode
 import requests
 import xmltodict
 from datetime import datetime, timedelta
+
 from Entry import Entry
 import logging
+
+from redis_helper import load_from_redis, write_to_redis
 
 log = logging.getLogger('werkzeug')
 
@@ -14,17 +16,16 @@ class GeeklistScraper:
     geeklist_id: int
     max_timestamp: datetime
     entries: dict[int, Entry] = {}
-    filename: str = ''
+    key: str = ''
 
     def __init__(self, auction_id: int, force_scrape: bool = False):
         self.geeklist_id = auction_id
-        self.filename = f'games_{auction_id}.json'
+        self.key = f'games_{auction_id}'
         if force_scrape:
             self.parse_all()
         else:
-            with open(self.filename, 'r+') as f:
-                entries: list[Entry] = json.load(f)
-                self.entries = {e['id_']: Entry.from_json(e) for e in entries}
+            entries: list[Entry] = load_from_redis(self.key)
+            self.entries = {e['id_']: Entry.from_json(e) for e in entries}
 
     def parse_all(self):
         parsed = self.parse_geeklist()
@@ -46,19 +47,11 @@ class GeeklistScraper:
 
         entry_json = list(self.entries.values())
         s = Entry.schema().dumps(entry_json, many=True)
-        self.write_to_file(s)
+        write_to_redis(self.key, s)
 
         log.info('Finished scraping')
 
         return True
-
-    def write_to_file(self, s):
-        try:
-            with open(self.filename, 'w+') as f:
-                f.write(s)
-        except Exception as e:
-            log.error(e)
-            self.write_to_file(s)
 
     def parse_geeklist(self) -> dict:
         url = f'https://boardgamegeek.com/xmlapi/geeklist/{self.geeklist_id}?comments=1'

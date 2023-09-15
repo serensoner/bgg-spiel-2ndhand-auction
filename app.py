@@ -5,6 +5,7 @@ import datetime as dt
 from flask import Flask, render_template, request
 
 from GeeklistScraper import GeeklistScraper
+from redis_helper import load_from_redis
 
 app = Flask(__name__)
 AUCTION_ID = os.getenv('AUCTION_ID')
@@ -17,8 +18,7 @@ def home():
 
 @app.route('/json')
 def serve_json(ids: str = None, todaytomorrow: bool = False):
-    with open(f'games_{AUCTION_ID}.json', 'r+') as f:
-        games = json.load(f)
+    games = load_from_redis(f'games_{AUCTION_ID}')
 
     today_tomorrow = request.args.get('todaytomorrow', False)
     if today_tomorrow:
