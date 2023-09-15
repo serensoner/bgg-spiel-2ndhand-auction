@@ -1,4 +1,3 @@
-import ast
 import json
 import os
 from flask_apscheduler import APScheduler
@@ -19,7 +18,7 @@ def home():
 
 @app.route('/json')
 def serve_json(ids: str = None, todaytomorrow: bool = False):
-    games = ast.literal_eval(load_from_redis(f'games_{AUCTION_ID}'))
+    games = load_from_redis(f'games_{AUCTION_ID}')
 
     today_tomorrow = request.args.get('todaytomorrow', False)
     if today_tomorrow:
@@ -43,8 +42,8 @@ scheduler.start()
 
 
 # @scheduler.task('interval', id='scrape', seconds=60, misfire_grace_time=60, max_instances=1)
-# def job1():
-#     GeeklistScraper(int(os.getenv('AUCTION_ID')), force_scrape=True)
+def job1():
+    GeeklistScraper(int(os.getenv('AUCTION_ID')), force_scrape=True)
 
 
 if __name__ == '__main__':
