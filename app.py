@@ -42,9 +42,9 @@ scheduler.init_app(app)
 scheduler.start()
 
 
-@scheduler.task('interval', id='scrape', seconds=60, misfire_grace_time=60, max_instances=1)
-def job1():
-    GeeklistScraper(int(os.getenv('AUCTION_ID')), force_scrape=True)
+# @scheduler.task('interval', id='scrape', seconds=60, misfire_grace_time=60, max_instances=1)
+# def job1():
+#     GeeklistScraper(int(os.getenv('AUCTION_ID')), force_scrape=True)
 
 
 if __name__ == '__main__':
