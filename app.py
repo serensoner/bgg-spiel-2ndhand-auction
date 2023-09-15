@@ -17,7 +17,7 @@ def home():
 
 @app.route('/json')
 def serve_json(ids: str = None, todaytomorrow: bool = False):
-    with open(f'games_{AUCTION_ID}.json') as f:
+    with open(f'games_{AUCTION_ID}.json', 'r+') as f:
         games = json.load(f)
 
     today_tomorrow = request.args.get('todaytomorrow', False)

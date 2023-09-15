@@ -5,6 +5,9 @@ import requests
 import xmltodict
 from datetime import datetime, timedelta
 from Entry import Entry
+import logging
+
+log = logging.getLogger('werkzeug')
 
 
 class GeeklistScraper:
@@ -43,13 +46,18 @@ class GeeklistScraper:
 
         entry_json = list(self.entries.values())
         s = Entry.schema().dumps(entry_json, many=True)
+        self.write_to_file(s)
 
-        with open(self.filename, 'w+') as f:
-            f.write(s)
-
-        print('Finished scraping')
+        log.info('Finished scraping')
 
         return True
+
+    def write_to_file(self, s):
+        try:
+            with open(self.filename, 'w+') as f:
+                f.write(s)
+        except:
+            self.write_to_file(s)
 
     def parse_geeklist(self) -> dict:
         url = f'https://boardgamegeek.com/xmlapi/geeklist/{self.geeklist_id}?comments=1'
