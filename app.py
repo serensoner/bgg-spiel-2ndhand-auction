@@ -5,7 +5,7 @@ import datetime as dt
 from flask import Flask, render_template, request
 
 from GeeklistScraper import GeeklistScraper
-from redis_helper import load_from_redis
+from redis_helper import load_from_redis, write_to_redis
 
 app = Flask(__name__)
 AUCTION_ID = os.getenv('AUCTION_ID')
