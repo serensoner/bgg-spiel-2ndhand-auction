@@ -17,7 +17,7 @@ def remove_tag(text: str, tag: str) -> str:
 
 
 def send_slack_message(message):
-    url = 'https://hooks.slack.com/services/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'
+    url = os.getenv('SLACK_URL')
     requests.post(url, json={'text': message})
 
 
