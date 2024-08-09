@@ -98,7 +98,7 @@ var table = new DataTable('#table', {
     "orderable": false,
     "data": "id_",
     "render": function ( data_, type, row, meta ) {
-      return '<a target="_blank" href="https://boardgamegeek.com/geeklist/319184/essen-2023-no-shipping-auction-list-post-your-own?itemid='+data_+'#'+data_+'">'+data_+'</a>';
+      return '<a target="_blank" href="https://boardgamegeek.com/geeklist/{{ geeklist_id }}/essen-2023-no-shipping-auction-list-post-your-own?itemid='+data_+'#'+data_+'">'+data_+'</a>';
     }
   },{
     "targets": 9,

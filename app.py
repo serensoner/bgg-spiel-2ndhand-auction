@@ -7,18 +7,18 @@ from GeeklistScraper import GeeklistScraper
 from redis_helper import load_from_redis, write_to_redis
 
 app = Flask(__name__)
-AUCTION_ID = os.getenv('AUCTION_ID')
-geeklist = GeeklistScraper(int(os.getenv('AUCTION_ID')))
+GEEKLIST_ID = os.getenv('AUCTION_ID')
+geeklist = GeeklistScraper(int(GEEKLIST_ID))
 
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html', geeklist_id=GEEKLIST_ID)
 
 
 @app.route('/json')
 def serve_json(ids: str = None, todaytomorrow: bool = False):
-    games = load_from_redis(f'games_{AUCTION_ID}')
+    games = load_from_redis(f'games_{GEEKLIST_ID}')
 
     today_tomorrow = request.args.get('todaytomorrow', False)
     if today_tomorrow:
@@ -41,7 +41,7 @@ scheduler.init_app(app)
 scheduler.start()
 
 
-@scheduler.task('interval', id='scrape', seconds=3, misfire_grace_time=60, max_instances=1)
+@scheduler.task('interval', id='scrape', seconds=60, misfire_grace_time=60, max_instances=1)
 def job1():
     geeklist.parse_all()
 

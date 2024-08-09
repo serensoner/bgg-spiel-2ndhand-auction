@@ -19,6 +19,7 @@ class GeeklistScraper:
     max_timestamp: datetime
     entries: dict[str, Entry] = {}
     key: str = ''
+    send_list: list = []
 
     def __init__(self, auction_id: int, force_scrape: bool = False):
         self.geeklist_id = auction_id
@@ -30,6 +31,7 @@ class GeeklistScraper:
             self.entries = {str(e['id_']): Entry(**e) for e in entries}
 
     def parse_all(self):
+        self.send_list = []
         parsed = self.parse_geeklist()
         if not parsed.get('geeklist'):
             return False
@@ -40,6 +42,14 @@ class GeeklistScraper:
 
         for item in items:
             self.parse_game(item)
+
+        if self.send_list and DISCORD_URL:
+            messages = '\n'.join([e.get_message(type_='discord') for e in self.send_list])
+            send_discord_message(messages)
+
+        if self.send_list and DISCORD_URL:
+            messages = '\n'.join([e.get_message(type_='slack') for e in self.send_list])
+            send_slack_message(messages)
 
         for k in self.entries.keys():
             entry = self.entries[k]
@@ -84,12 +94,8 @@ class GeeklistScraper:
         }
         entry = Entry(**item_)
         if str(entry.id_) not in self.entries:
-            log.debug(f'sending {entry.id_} to slack and discord')
-            if DISCORD_URL:
-                send_discord_message(entry.get_message(type_='discord'))
-            if SLACK_URL:
-                send_slack_message(entry.get_message(type_='slack'))
-            # pass
+            self.send_list.append(entry)
+
         self.entries[str(entry.id_)] = entry
 
     def get_subset(self, **kwargs):
