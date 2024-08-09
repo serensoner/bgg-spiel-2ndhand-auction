@@ -1,6 +1,9 @@
 import os
-
 import requests
+
+
+SLACK_URL = os.getenv('SLACK_URL')
+DISCORD_URL = os.getenv('DISCORD_URL')
 
 
 def remove_tag(text: str, tag: str) -> str:
@@ -17,10 +20,8 @@ def remove_tag(text: str, tag: str) -> str:
 
 
 def send_slack_message(message):
-    url = os.getenv('SLACK_URL')
-    requests.post(url, json={'text': message})
+    requests.post(SLACK_URL, json={'text': message})
 
 
 def send_discord_message(message: str) -> None:
-    url = os.getenv('DISCORD_URL')
-    requests.post(url, json={'content': message})
+    requests.post(DISCORD_URL, json={'content': message})

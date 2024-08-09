@@ -1,3 +1,4 @@
+import os
 import time
 import bbcode
 import requests
@@ -8,7 +9,7 @@ from Entry import Entry
 import logging
 
 from redis_helper import load_from_redis, write_to_redis
-from text_utils import send_slack_message, send_discord_message
+from text_utils import send_slack_message, send_discord_message, DISCORD_URL, SLACK_URL
 
 log = logging.getLogger('werkzeug')
 
@@ -83,7 +84,11 @@ class GeeklistScraper:
         }
         entry = Entry(**item_)
         if str(entry.id_) not in self.entries:
-            send_discord_message(entry.get_message(type_='discord'))
+            log.debug(f'sending {entry.id_} to slack and discord')
+            if DISCORD_URL:
+                send_discord_message(entry.get_message(type_='discord'))
+            if SLACK_URL:
+                send_slack_message(entry.get_message(type_='slack'))
             # pass
         self.entries[str(entry.id_)] = entry
 
