@@ -1,4 +1,3 @@
-import json
 import os
 from flask_apscheduler import APScheduler
 import datetime as dt
@@ -9,6 +8,7 @@ from redis_helper import load_from_redis, write_to_redis
 
 app = Flask(__name__)
 AUCTION_ID = os.getenv('AUCTION_ID')
+geeklist = GeeklistScraper(int(os.getenv('AUCTION_ID')))
 
 
 @app.route('/')
@@ -19,7 +19,6 @@ def home():
 @app.route('/json')
 def serve_json(ids: str = None, todaytomorrow: bool = False):
     games = load_from_redis(f'games_{AUCTION_ID}')
-    games = json.loads(games)
 
     today_tomorrow = request.args.get('todaytomorrow', False)
     if today_tomorrow:
@@ -42,9 +41,9 @@ scheduler.init_app(app)
 scheduler.start()
 
 
-# @scheduler.task('interval', id='scrape', seconds=60, misfire_grace_time=60, max_instances=1)
+@scheduler.task('interval', id='scrape', seconds=30, misfire_grace_time=60, max_instances=1)
 def job1():
-    GeeklistScraper(int(os.getenv('AUCTION_ID')), force_scrape=True)
+    geeklist.parse_all()
 
 
 if __name__ == '__main__':

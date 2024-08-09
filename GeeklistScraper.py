@@ -8,6 +8,7 @@ from Entry import Entry
 import logging
 
 from redis_helper import load_from_redis, write_to_redis
+from text_utils import send_slack_message, send_discord_message
 
 log = logging.getLogger('werkzeug')
 
@@ -15,7 +16,7 @@ log = logging.getLogger('werkzeug')
 class GeeklistScraper:
     geeklist_id: int
     max_timestamp: datetime
-    entries: dict[int, Entry] = {}
+    entries: dict[str, Entry] = {}
     key: str = ''
 
     def __init__(self, auction_id: int, force_scrape: bool = False):
@@ -24,8 +25,8 @@ class GeeklistScraper:
         if force_scrape:
             self.parse_all()
         else:
-            entries: list[Entry] = load_from_redis(self.key)
-            self.entries = {e['id_']: Entry.from_json(e) for e in entries}
+            entries = load_from_redis(self.key)
+            self.entries = {str(e['id_']): Entry(**e) for e in entries}
 
     def parse_all(self):
         parsed = self.parse_geeklist()
@@ -55,6 +56,7 @@ class GeeklistScraper:
 
     def parse_geeklist(self) -> dict:
         url = f'https://boardgamegeek.com/xmlapi/geeklist/{self.geeklist_id}?comments=1'
+        log.info(f'parsing {url}')
         page = requests.get(url)
         if page.status_code == 202:
             time.sleep(10)
@@ -80,7 +82,10 @@ class GeeklistScraper:
             'comments_raw': comments,
         }
         entry = Entry(**item_)
-        self.entries[entry.id_] = entry
+        if str(entry.id_) not in self.entries:
+            send_discord_message(entry.get_message(type_='discord'))
+            # pass
+        self.entries[str(entry.id_)] = entry
 
     def get_subset(self, **kwargs):
         entries = list(self.entries.values())

@@ -69,6 +69,7 @@ class Entry:
     last_seen: datetime = field(default=datetime.now(), repr=False)
     deleted: bool = False
     is_ended: bool = False
+    url: str = ''
 
     def remove_strikethroughs(self):
         self.body = remove_tag(self.body_raw, '-')
@@ -92,9 +93,17 @@ class Entry:
             except:
                 pass
 
-        self.post_date = parser.parse(self.post_date)
+        if isinstance(self.post_date, float):
+            self.post_date = datetime.fromtimestamp(self.post_date)
+        else:
+            self.post_date = parser.parse(self.post_date)
+
         self.post_date_json = self.post_date.strftime('%b %d')
-        self.edit_date = parser.parse(self.edit_date)
+
+        if isinstance(self.edit_date, float):
+            self.edit_date = datetime.fromtimestamp(self.edit_date)
+        else:
+            self.edit_date = parser.parse(self.edit_date)
         self.edit_date_json = self.edit_date.strftime('%b %d')
         if self.auction_end_str:
             try:
@@ -125,3 +134,28 @@ class Entry:
                     self.is_ended = self.is_sold
 
         self.current = self.max_bid if self.max_bid else self.starting_bid
+        self.url = f'https://boardgamegeek.com/geeklist/{self.geeklist_id}?itemid={self.id_}'
+        
+    def get_message(self, type_: str) -> str:
+        if type_ == 'slack':
+            message = f'''* <{self.url}|{self.name}>'''
+        elif type_ == 'discord':
+            message = f'''* [{self.name}]({self.url})'''
+        else:
+            return
+        if self.starting_bid or self.soft_res or self.bin_price:
+            message += '\n'
+        if self.starting_bid:
+            message += f'''start: {self.starting_bid} '''
+        if self.soft_res:
+            message += f'''sr: {self.soft_res} '''
+        if self.bin_price:
+            message += f'''bin: {self.bin_price} '''
+        if self.condition:
+            message += f'''\ncondition: {self.condition} '''
+        if self.language:
+            message += f'''\nlangs: {self.language} '''
+        if self.username:
+            message += f'''\nuser: {self.username} '''
+
+        return message
