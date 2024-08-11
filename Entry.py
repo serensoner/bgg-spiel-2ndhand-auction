@@ -114,6 +114,9 @@ class Entry:
 
             self.is_ended = self.auction_end < datetime.now().today()
 
+        if isinstance(self.last_seen, float):
+            self.last_seen = datetime.fromtimestamp(self.last_seen)
+
         if self.comments_raw:
             self.comments = [Comment(
                 username=c['@username'], date_str=c['@date'], postdate_str=c['@postdate'],

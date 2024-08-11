@@ -10,32 +10,35 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
     <style>
-      td {
-    position: relative;
-    padding: 5px 10px;
-}
+        td {
+      position: relative;
+      padding: 5px 10px;
+  }
 
-tr.strikeout td:before {
-    content: " ";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    border-bottom: 1px solid #111;
-    width: 100%;
-}
+  tr.strikeout td:before {
+      content: " ";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      border-bottom: 1px solid #111;
+      width: 100%;
+  }
 
-.dataTables_filter { display: none; }
+  .dataTables_filter { display: none; }
 
     </style>
 </head>
 <body>
-<h1 class="text-center">Spiel 2023 no shipping auction tracker</h1>
+<h1 class="text-center">Spiel 2024 no shipping auction tracker</h1>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
         crossorigin="anonymous"></script>
 
 
 <div class="container shadow min-vh-100 py-2">
+    <div class="mb-3">
+        <input type="text" id="userName" class="form-control" placeholder="Name">
+    </div>
     <div class="form-check">
         <input class="form-check-input" type="checkbox" value="" id="form-check-sold">
         <label class="form-check-label" for="form-check-sold">
@@ -73,171 +76,207 @@ tr.strikeout td:before {
         </table>
     </div>
 </div>
-
+<div id="alertContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <!-- Alert will be injected here -->
+</div>
 
 </body>
 </html>
 <script type="text/javascript">
-
-function format(d) {
-    return (
-        '<dl><dd>' + d.body_text + '</dd><dt>Comments</dt><dd>' + d.comments_json.join('<br />') + '</dd></dl>'
-    );
-}
-
-var url = '/json';
-var table = new DataTable('#table', {
-    select: true,
-    order: [[7, 'desc']],
-     pageLength: 50,
-     lengthChange: false,
-     ajax: {url: url, dataSrc: ''},
-
-"columnDefs": [ {
-    "targets": 1,
-    "orderable": false,
-    "data": "id_",
-    "render": function ( data_, type, row, meta ) {
-      return '<a target="_blank" href="https://boardgamegeek.com/geeklist/{{ geeklist_id }}/essen-2023-no-shipping-auction-list-post-your-own?itemid='+data_+'#'+data_+'">'+data_+'</a>';
+    function format(d) {
+        return (
+            '<dl><dd>' + d.body_text + '</dd><dt>Comments</dt><dd>' + d.comments_json.join('<br />') + '</dd></dl>'
+        );
     }
-  },{
-    "targets": 9,
-    "orderable": false,
-    "data": "id_",
-    "render": function ( data_, type, row, meta ) {
-      return '<input type="checkbox" name="day_name_selector[]" id="'+data_+'" value="'+data_+'"/>';
-    }
-  },
-],
-        columns: [
-        {
-            className: 'dt-control',
-            orderable: false,
-            data: null,
-            defaultContent: ''
-        },
-        { data: 'id_' },
-        { data: 'name' },
-        { data: 'current' },
-        { data: 'bin_price' },
-        { data: 'username' },
-        { data: 'max_bidder' },
-        { data: 'post_date_json', type: 'date' },
-        { data: 'auction_end_json', type: 'date' },
-      {
-        data: 'id_',
-        className: 'dt-copy',
-            orderable: false,
-      },
-        { data: 'is_sold', visible: false },
-        { data: 'is_ended', visible: false },
-    ],
-"rowCallback": function (row, data, index) {
-                    if ((data.is_sold) | (data.is_ended) ){
-                        $(row).addClass('table-secondary text-dark');
-                    }
-      },
-    initComplete: function () {
-        this.api()
-            .columns([2, 5, 6])
-            .every(function () {
-                let column = this;
-                let title = column.header().textContent;
 
-                // Create input element
-                let input = document.createElement('input');
-                input.placeholder = title;
-                input.className = "form-control";
-                column.header().replaceChildren(input);
+    const userName = localStorage.getItem('userInput');
+    var url = '/json/' + userName;
 
-                // Event listener for user input
-                input.addEventListener('keyup', () => {
-                    if (column.search() !== this.value) {
-                        column.search(input.value).draw();
+    function draw() {
+        var table = new DataTable('#table', {
+            select: true,
+            order: [[1, 'desc']],
+            pageLength: 50,
+            lengthChange: false,
+            ajax: {url: url, dataSrc: ''},
+
+            "columnDefs": [
+                {
+                    "targets": 1,
+                    "orderable": false,
+                    "data": "id_",
+                    "render": function ( data_, type, row, meta ) {
+                        return '<a target="_blank" href="https://boardgamegeek.com/geeklist/{{ geeklist_id }}/essen-2024-no-shipping-auction-list-post-your-own?itemid='+data_+'#'+data_+'">'+data_+'</a>';
                     }
-                });
+                },
+                {
+                    "targets": 9,
+                    "orderable": false,
+                    "data": "id_",
+                    "render": function ( data_, type, row, meta ) {
+                        var checked = row.shortlist ? 'checked' : '';
+                        return '<input type="checkbox" name="day_name_selector[]" id="'+row.id_+'" value="'+row.id_+'" '+checked+'/>';
+                    }
+                },
+            ],
+            columns: [
+                {
+                    className: 'dt-control',
+                    data: null,
+                    defaultContent: ''
+                },
+                { data: 'id_' },
+                { data: 'name' },
+                { data: 'current' },
+                { data: 'bin_price' },
+                { data: 'username' },
+                { data: 'max_bidder' },
+                { data: 'post_date_json', type: 'date' },
+                { data: 'auction_end_json', type: 'date' },
+                { data: 'shortlist_checkbox', className: 'dt-copy', orderable: false,},
+                { data: 'is_sold', visible: false },
+                { data: 'is_ended', visible: false },
+                { data: 'shortlist', visible: false },
+            ],
+            "rowCallback": function (row, data, index) {
+                if ((data.is_sold) | (data.is_ended) ){
+                    $(row).addClass('table-secondary text-dark');
+                }
+            },
+            initComplete: function () {
+                this.api()
+                    .columns([2, 5, 6])
+                    .every(function () {
+                        let column = this;
+                        let title = column.header().textContent;
+
+                        // Create input element
+                        let input = document.createElement('input');
+                        input.placeholder = title;
+                        input.className = "form-control";
+                        column.header().replaceChildren(input);
+
+                        // Event listener for user input
+                        input.addEventListener('keyup', () => {
+                            if (column.search() !== this.value) {
+                                column.search(input.value).draw();
+                            }
+                        });
+                    });
+                },
+             });
+
+            const hide_sold_checkbox = document.getElementById('form-check-sold')
+
+            hide_sold_checkbox.addEventListener('change', (event) => {
+                if (event.currentTarget.checked) {
+                    table.column(10).search(false).column(11).search(false).draw();
+                } else {
+                    table.column(10).search('').column(11).search('').draw();
+                }
+            })
+
+            const show_shortlisted_only_checkbox = document.getElementById('form-show-shortlist')
+
+            show_shortlisted_only_checkbox.addEventListener('change', (event) => {
+                if (event.currentTarget.checked) {
+                    table.column(12).search(true).draw();
+                } else {
+                    table.column(12).search('').draw();
+                }
+            })
+
+
+            // Add event listener for opening and closing details
+            table.on('click', 'td.dt-control', function (e) {
+                let tr = e.target.closest('tr');
+                let row = table.row(tr);
+
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child.hide();
+                }
+                else {
+                    // Open this row
+                    row.child(format(row.data())).show();
+                }
             });
+    });
 
-    },
- });
+    table.on('click', 'td.dt-copy input', function (e) {
+        let input2 = e.target;
 
-const hide_sold_checkbox = document.getElementById('form-check-sold')
+        // Log the input element and its attributes to the console for debugging
+        console.log('Input element:', input2);
+        console.log('Input value attribute:', input2.getAttribute('value'));
+        let tr = e.target.closest('tr');
+        let row = table.row(tr);
+        let input = e.target.closest('input');
+        let current_id = input.getAttribute('value'); // Get the value attribute of the checkbox
 
-hide_sold_checkbox.addEventListener('change', (event) => {
-    if (event.currentTarget.checked) {
-        table.column(10).search(false).column(11).search(false).draw();
-    } else {
-        table.column(10).search('').column(11).search('').draw();
-    }
-})
+        // Determine action based on whether the checkbox is checked
+        let action = input.checked ? 'add' : 'remove';
 
+        // Prepare the data to be sent in the POST request
+        var formData = new FormData();
+        formData.append('action', action);  // 'add' to add to shortlist, 'remove' to remove from shortlist
+        formData.append('game_id', current_id);  // ID of the game being added or removed
 
-// Add event listener for opening and closing details
-table.on('click', 'td.dt-control', function (e) {
-    let tr = e.target.closest('tr');
-    let row = table.row(tr);
-
-    if (row.child.isShown()) {
-        // This row is already open - close it
-        row.child.hide();
-    }
-    else {
-        // Open this row
-        row.child(format(row.data())).show();
-    }
-});
-
-const show_only_mine = document.getElementById('form-show-shortlist');
-show_only_mine.addEventListener('change', (event) => {
-    if (event.currentTarget.checked) {
-        var shortlist = localStorage.getItem('shortlist');
-        url = '/json?ids=' + shortlist;
-        table.ajax.url(url).load();
-    } else {
-        url = '/json'
-        table.ajax.url(url).load();
-    }
-})
-
-const show_today_tomorrow = document.getElementById('form-show-todaytomorrow');
-show_today_tomorrow.addEventListener('change', (event) => {
-    if (event.currentTarget.checked) {
-        url = '/json?todaytomorrow=1';
-        table.ajax.url(url).load();
-    } else {
-        url = '/json'
-        table.ajax.url(url).load();
-    }
-})
-
-
-
-
-table.on('click', 'td.dt-copy input', function (e) {
-    let tr = e.target.closest('tr');
-    let row = table.row(tr);
-    let input = e.target.closest('input');
-    let current_id = input.value;
-    var shortlist = localStorage.getItem('shortlist');
-    if (shortlist) {
-        var shortlisted_games = shortlist.split(';');
-    }
-    else {
-        var shortlisted_games = [];
-    }
-
-    if (input.checked) {
-        shortlisted_games.push(current_id);
-    } else {
-        for (var i = shortlisted_games.length - 1; i >= 0; i--) {
-            if (shortlisted_games[i] === current_id) {
-                shortlisted_games.splice(i, 1);
+        // Send the POST request
+        fetch('/shortlist/' + userName, {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (response.ok) {
+                showBootstrapAlert('Shortlist saved successfully!', 'alert-warning');
+            } else {
+                showBootstrapAlert('Failed to save shortlist.', 'alert-danger');
             }
+        }).catch(error => {
+            showBootstrapAlert('Error occurred while saving shortlist.', 'alert-danger');
+            console.error('Error:', error);
+        });
+        });
+
+        if (userName) {
+            document.getElementById('userName').value = userName;
         }
-    }
 
-    localStorage.setItem('shortlist', shortlisted_games.join(';'));
-    var shortlist = localStorage.getItem('shortlist');
+        document.getElementById('userName').addEventListener('input', function() {
+            localStorage.setItem('userInput', this.value);
+        });
 
-});
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch the shortlist data from the Flask endpoint
+            fetch('/load_shortlist/' + userName)
+                .then(response => response.json())
+                .then(data => {
+                    // Store the shortlist in localStorage
+                    localStorage.setItem('shortlist', data.shortlist);
+                    console.log('Shortlist loaded into localStorage:', data.shortlist);
+                })
+                .catch(error => {
+                    console.error('Error loading shortlist:', error);
+                });
+        });
+
+        function showBootstrapAlert(message, alertType) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertType} alert-dismissible fade show`;
+            alert.role = 'alert';
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+
+            alertContainer.appendChild(alert);
+
+            // Automatically remove the alert after 3 seconds
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 150); // Wait for fade out to finish before removing
+            }, 3000);
+        }
+
 </script>
