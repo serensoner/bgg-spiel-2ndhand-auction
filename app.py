@@ -70,7 +70,7 @@ scheduler.init_app(app)
 scheduler.start()
 
 
-@scheduler.task('interval', id='scrape', seconds=60, misfire_grace_time=60, max_instances=1)
+@scheduler.task('interval', id='scrape', seconds=5, misfire_grace_time=60, max_instances=1)
 def job1():
     geeklist.parse_all()
 

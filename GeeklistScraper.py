@@ -36,9 +36,11 @@ class GeeklistScraper:
         if not parsed.get('geeklist'):
             return False
         items = parsed.get('geeklist').get('item')
-
+        print('parsing finished')
         if not items:
             return False
+
+        self.parse_game(items[2605])
 
         for item in items:
             self.parse_game(item)

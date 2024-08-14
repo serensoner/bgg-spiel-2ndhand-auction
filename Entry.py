@@ -29,6 +29,9 @@ def remove_tag(text: str, tag: str) -> str:
     end_tag_text = f'[/{tag}]'
     end_tag_loc = text.find(end_tag_text)
 
+    if end_tag_loc < start_tag_loc:
+        return text
+
     removed = f'{text[:start_tag_loc]} {text[end_tag_loc + len(end_tag_text):]}'
 
     return remove_tag(removed, tag)
