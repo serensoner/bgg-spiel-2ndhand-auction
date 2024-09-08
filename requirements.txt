@@ -9,3 +9,4 @@ apscheduler
 dataclasses-json
 flask-apscheduler
 redis
+bs4
