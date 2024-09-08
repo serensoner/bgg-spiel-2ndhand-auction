@@ -1,5 +1,6 @@
 import os
 import time
+from bs4 import BeautifulSoup
 import bbcode
 import requests
 import xmltodict
@@ -91,7 +92,7 @@ class GeeklistScraper:
             'post_date': item_['@postdate'],
             'edit_date': item_['@editdate'],
             'body_raw': item_['body'],
-            'body_text': bbcode.render_html(item_['body']),
+            'body_text': BeautifulSoup(bbcode.render_html(item_['body'])). get_text(),
             'comments_raw': comments,
         }
         entry = Entry(**item_)

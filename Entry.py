@@ -73,12 +73,13 @@ class Entry:
     deleted: bool = False
     is_ended: bool = False
     url: str = ''
+    body_cleaned: str = ''
 
     def remove_strikethroughs(self):
-        self.body = remove_tag(self.body_raw, '-')
+        self.body_cleaned = remove_tag(self.body_raw, '-')
 
     def assign_field(self, field_name):
-        groups = re.search(REGEXES[field_name], self.body, re.IGNORECASE)
+        groups = re.search(REGEXES[field_name], self.body_text, re.IGNORECASE)
         if groups:
             setattr(self, field_name, groups.group(1).strip())
 
