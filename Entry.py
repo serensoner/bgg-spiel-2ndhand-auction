@@ -114,7 +114,7 @@ class Entry:
                 self.auction_end = parser.parse(self.auction_end_str, fuzzy=True)
                 self.auction_end_json = self.auction_end.strftime('%b %d')
             except ParserError:
-                self.auction_end = datetime(2099, 12, 31)
+                self.auction_end = datetime(2024, 12, 31)
 
             self.is_ended = self.auction_end < datetime.now().today()
 

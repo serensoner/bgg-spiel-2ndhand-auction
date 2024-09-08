@@ -92,7 +92,9 @@ class GeeklistScraper:
             'post_date': item_['@postdate'],
             'edit_date': item_['@editdate'],
             'body_raw': item_['body'],
-            'body_text': BeautifulSoup(bbcode.render_html(item_['body'])). get_text(),
+            'body_text': BeautifulSoup(
+                bbcode.render_html(item_['body']), features='html.parser'
+            ).get_text(),
             'comments_raw': comments,
         }
         entry = Entry(**item_)
