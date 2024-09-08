@@ -95,6 +95,7 @@ class GeeklistScraper:
             'body_text': BeautifulSoup(
                 bbcode.render_html(item_['body']), features='html.parser'
             ).get_text(),
+            'body': bbcode.render_html(item_['body']),
             'comments_raw': comments,
         }
         entry = Entry(**item_)

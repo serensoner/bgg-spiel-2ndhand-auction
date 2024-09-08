@@ -85,7 +85,7 @@ class Entry:
 
     def __post_init__(self):
         self.remove_strikethroughs()
-        if not self.body or len(self.body) < 100:
+        if not self.body_cleaned or len(self.body_cleaned) < 100:
             self.is_ended = True
 
         for k in REGEXES.keys():
@@ -116,7 +116,7 @@ class Entry:
             except ParserError:
                 self.auction_end = datetime(2024, 12, 31)
 
-            self.is_ended = self.auction_end < datetime.now().today()
+            self.is_ended = self.is_ended or self.auction_end < datetime.now().today()
 
         if isinstance(self.last_seen, float):
             self.last_seen = datetime.fromtimestamp(self.last_seen)
@@ -137,8 +137,8 @@ class Entry:
                 self.max_bid = max([m.bid for m in self.bids])
                 self.max_bidder = next(m.username for m in self.bids if m.bid == self.max_bid)
                 if self.bin_price:
-                    self.is_sold = self.max_bid >= self.bin_price
-                    self.is_ended = self.is_sold
+                    self.is_sold = self.is_sold or self.max_bid >= self.bin_price
+                    self.is_ended = self.is_ended or self.is_sold
 
         self.current = self.max_bid if self.max_bid else self.starting_bid
         self.url = f'https://boardgamegeek.com/geeklist/{self.geeklist_id}?itemid={self.id_}'
