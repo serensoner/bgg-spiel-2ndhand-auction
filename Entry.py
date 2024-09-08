@@ -63,7 +63,7 @@ class Entry:
     auction_end_str: str = field(default=None, repr=False)
     auction_end: datetime = field(default=None, repr=False)
     comments: list[Comment] = field(default=None, repr=False)
-    comments_json: list[str] = field(default=None, repr=False)
+    comments_json: list[str] = field(default_factory=lambda: [], repr=False)
     bids: list[Comment] = field(default=None, repr=False)
     max_bid: float = None
     current: float = None

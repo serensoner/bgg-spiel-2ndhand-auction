@@ -84,8 +84,12 @@
 </html>
 <script type="text/javascript">
     function format(d) {
+        var comments_json_part = '';
+        if (d.comments_json) {
+            comments_json_part = d.comments_json.join('<br />');
+        }
         return (
-            '<dl><dd>' + d.body_text + '</dd><dt>Comments</dt><dd>' + d.comments_json.join('<br />') + '</dd></dl>'
+            '<dl><dd>' + d.body_text + '</dd><dt>Comments</dt><dd>' + comments_json_part + '</dd></dl>'
         );
     }
 

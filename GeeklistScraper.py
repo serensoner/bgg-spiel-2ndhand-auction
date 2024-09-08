@@ -35,8 +35,9 @@ class GeeklistScraper:
         parsed = self.parse_geeklist()
         if not parsed.get('geeklist'):
             return False
+        log.info('scraping finished')
         items = parsed.get('geeklist').get('item')
-        print('parsing finished')
+        log.info('parsing finished')
         if not items:
             return False
 
@@ -72,9 +73,8 @@ class GeeklistScraper:
         log.info(f'parsing {url}')
         page = requests.get(url)
         if page.status_code == 202:
-            time.sleep(10)
-            log.info(f'Sleeping... {self.geeklist_id}')
-            return self.parse_geeklist()
+            log.info(f'Returned 202, sleeping... {self.geeklist_id}')
+            return {}
         return xmltodict.parse(page.content)
 
     def parse_game(self, item_: dict):
