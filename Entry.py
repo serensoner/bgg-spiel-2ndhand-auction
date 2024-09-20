@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 import bbcode
 from dataclasses_json import dataclass_json
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from Comment import Comment
 import re
 from dateutil import parser
@@ -37,6 +37,25 @@ def remove_tag(text: str, tag: str) -> str:
     return remove_tag(removed, tag)
 
 
+def parse_auction_end_date(s: str) -> date:
+    year = date.today().year
+    s = s.lower()
+    if 'aug' in s:
+        month = 8
+    elif 'sep' in s:
+        month = 9
+    else:
+        month = 10
+
+    numbers = re.findall(r'\d+', s)
+    numbers = list(map(int, numbers))
+    if year in numbers:
+        numbers.remove(year)
+    day = numbers[0]
+
+    return date(year, month, day)
+
+
 @dataclass_json
 @dataclass
 class Entry:
@@ -47,8 +66,8 @@ class Entry:
     username: str = field(repr=False)
     post_date: datetime | str = field(repr=False)
     edit_date: datetime | str = field(repr=False)
-    body_raw: str = field(repr=False)
-    body_text: str
+    body_raw: str = field(repr=False, default='')
+    body_text: str = field(repr=False, default='')
     post_date_json: str = None
     edit_date_json: str = None
     auction_end_json: str = None
@@ -61,7 +80,7 @@ class Entry:
     hard_res: float = None
     bin_price: float = None
     auction_end_str: str = field(default=None, repr=False)
-    auction_end: datetime = field(default=None, repr=False)
+    auction_end: date = field(default=None, repr=False)
     comments: list[Comment] = field(default=None, repr=False)
     comments_json: list[str] = field(default_factory=lambda: [], repr=False)
     bids: list[Comment] = field(default=None, repr=False)
@@ -74,6 +93,7 @@ class Entry:
     is_ended: bool = False
     url: str = ''
     body_cleaned: str = ''
+    is_parsed: bool = False
 
     def remove_strikethroughs(self):
         self.body_cleaned = remove_tag(self.body_raw, '-')
@@ -84,6 +104,11 @@ class Entry:
             setattr(self, field_name, groups.group(1).strip())
 
     def __post_init__(self):
+        if isinstance(self.last_seen, float):
+            self.last_seen = datetime.fromtimestamp(self.last_seen)
+
+        if self.is_parsed:
+            return
         self.remove_strikethroughs()
         if not self.body_cleaned or len(self.body_cleaned) < 100:
             self.is_ended = True
@@ -111,15 +136,14 @@ class Entry:
         self.edit_date_json = self.edit_date.strftime('%b %d')
         if self.auction_end_str:
             try:
-                self.auction_end = parser.parse(self.auction_end_str, fuzzy=True)
+                self.auction_end = parse_auction_end_date(self.auction_end_str[:30])
                 self.auction_end_json = self.auction_end.strftime('%b %d')
-            except ParserError:
-                self.auction_end = datetime(2024, 12, 31)
+            except Exception:
+                self.auction_end = date(2024, 12, 30)
 
-            self.is_ended = self.is_ended or self.auction_end < datetime.now().today()
-
-        if isinstance(self.last_seen, float):
-            self.last_seen = datetime.fromtimestamp(self.last_seen)
+            self.is_ended = self.is_ended or self.auction_end < date.today() - timedelta(days=1)
+        else:
+            self.auction_end = date(2024, 12, 30)
 
         if self.comments_raw:
             self.comments = [Comment(

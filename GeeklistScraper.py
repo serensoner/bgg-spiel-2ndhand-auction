@@ -25,11 +25,14 @@ class GeeklistScraper:
     def __init__(self, auction_id: int, force_scrape: bool = False):
         self.geeklist_id = auction_id
         self.key = f'games_{auction_id}'
+        self.key_full = f'games_{auction_id}_full'
         if force_scrape:
             self.parse_all()
         else:
             entries = load_from_redis(self.key)
-            self.entries = {str(e['id_']): Entry(**e) for e in entries}
+            self.entries = {str(e['id_']): Entry(
+                **{**e, **{'is_parsed': True}}
+            ) for e in entries}
 
     def parse_all(self):
         self.send_list = []
@@ -41,8 +44,6 @@ class GeeklistScraper:
         log.info('parsing finished')
         if not items:
             return False
-
-        self.parse_game(items[2605])
 
         for item in items:
             self.parse_game(item)
@@ -63,6 +64,14 @@ class GeeklistScraper:
 
         entry_json = list(self.entries.values())
         s = Entry.schema().dumps(entry_json, many=True)
+        write_to_redis(self.key_full, s)
+
+        skipped_keys = [
+            'body_cleaned', 'body_raw', 'auction_end', 'auction_end_str',
+            'body_text', 'comments', 'comments_raw', 'bids', 'condition'
+        ]
+        s = Entry.schema(exclude=skipped_keys).dumps(entry_json, many=True)
+
         write_to_redis(self.key, s)
 
         log.info('Finished scraping')

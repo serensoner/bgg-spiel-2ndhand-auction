@@ -61,4 +61,3 @@ class Comment:
         self.post_date_json = self.post_date.strftime('%b %d')
         self.edit_date = parser.parse(self.editdate_str)
         self.edit_date_json = self.edit_date.strftime('%b %d')
-

@@ -51,12 +51,6 @@
             Show only shortlisted
         </label>
     </div>
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="" id="form-show-todaytomorrow">
-        <label class="form-check-label" for="form-show-todaytomorrow">
-            Show ending today & tomorrow
-        </label>
-    </div>
     <div class="table-responsive">
         <table id="table" class="table accordion table-sm small" style="width: 100%">
             <thead>
@@ -172,9 +166,9 @@
 
         hide_sold_checkbox.addEventListener('change', (event) => {
             if (event.currentTarget.checked) {
-                table.column(10).search(false).column(11).search(false).draw();
+                table.column(11).search(false).draw();
             } else {
-                table.column(10).search('').column(11).search('').draw();
+                table.column(11).search('').draw();
             }
         })
 
