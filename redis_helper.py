@@ -22,4 +22,4 @@ def load_from_redis(key: str):
     with redis.StrictRedis(connection_pool=conn_pool) as conn:
         val = conn.get(key)
         if val:
-            return json.loads(pickle.loads(val))
+            return pickle.loads(val)

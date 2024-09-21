@@ -63,16 +63,19 @@ class GeeklistScraper:
                 self.entries[k] = entry
 
         entry_json = list(self.entries.values())
-        s = Entry.schema().dumps(entry_json, many=True)
-        write_to_redis(self.key_full, s)
+        write_to_redis(self.key_full, [
+            {k: v for k, v in entry.__dict__.items()}
+            for entry in entry_json
+        ])
 
         skipped_keys = [
             'body_cleaned', 'body_raw', 'auction_end', 'auction_end_str',
             'body_text', 'comments', 'comments_raw', 'bids', 'condition'
         ]
-        s = Entry.schema(exclude=skipped_keys).dumps(entry_json, many=True)
-
-        write_to_redis(self.key, s)
+        write_to_redis(self.key, [
+            {k: v for k, v in entry.__dict__.items() if k not in skipped_keys}
+            for entry in entry_json
+        ])
 
         log.info('Finished scraping')
 
