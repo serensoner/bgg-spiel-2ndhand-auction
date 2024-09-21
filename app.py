@@ -28,7 +28,7 @@ def shortlist_action(username: str):
         shortlist = shortlist.split(';')
         shortlist.remove(str(game_id))
         shortlist = ';'.join(shortlist)
-    write_to_redis(f'SPIEL2024_SHORTLIST_{username}', json.dumps(shortlist))
+    write_to_redis(f'SPIEL2024_SHORTLIST_{username}', shortlist)
     return '', 200
 
 
