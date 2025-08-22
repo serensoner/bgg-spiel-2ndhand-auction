@@ -9,7 +9,6 @@ from logger import logger
 
 app = Flask(__name__)
 GEEKLIST_ID = os.getenv('AUCTION_ID')
-# TODO PARSE IS SOLD AS WELL 11056867
 
 @app.route('/')
 def home():
