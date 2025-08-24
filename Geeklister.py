@@ -20,8 +20,6 @@ from logger import logger
 
 AUCTION_ID = os.getenv("AUCTION_ID")
 BEARER_TOKEN = os.getenv("BEARER_TOKEN")
-DISCORD_URL: Optional[str] = None  # set externally
-SLACK_URL: Optional[str] = None    # set externally
 
 
 class GeeklistScraper:
@@ -142,13 +140,14 @@ class GeeklistParser:
         self.entries[key] = entry
 
     def _notify(self) -> None:
+        logger.info(f"{len(self.send_list)=} {DISCORD_URL=}")
         if self.send_list:
             if DISCORD_URL:
                 messages = "\n".join(e.get_message(type_="discord") for e in self.send_list)
-                send_discord_message(messages)
+                send_discord_message(messages, DISCORD_URL)
             if SLACK_URL:
                 messages = "\n".join(e.get_message(type_="slack") for e in self.send_list)
-                send_slack_message(messages)
+                send_slack_message(messages, SLACK_URL)
 
     def _mark_deleted(self) -> None:
         cutoff = datetime.now() - timedelta(hours=1)

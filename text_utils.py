@@ -19,9 +19,9 @@ def remove_tag(text: str, tag: str) -> str:
     return remove_tag(removed, tag)
 
 
-def send_slack_message(message):
-    requests.post(SLACK_URL, json={'text': message})
+def send_slack_message(message: str, url: str) -> None:
+    requests.post(url, json={'text': message})
 
 
-def send_discord_message(message: str) -> None:
-    requests.post(DISCORD_URL, json={'content': message})
+def send_discord_message(message: str, url: str) -> None:
+    requests.post(url, json={'content': message})

@@ -171,7 +171,7 @@ class Entry:
         if type_ == 'slack':
             message = f'''* <{self.url}|{self.name}>'''
         elif type_ == 'discord':
-            message = f'''* [{self.name}]({self.url})'''
+            message = f'''* {self.name} <{self.url}>'''
         else:
             return
         if self.starting_bid or self.soft_res or self.bin_price:
