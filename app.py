@@ -10,6 +10,7 @@ from redis_helper import load_from_redis, write_to_redis
 app = Flask(__name__)
 GEEKLIST_ID = os.getenv('AUCTION_ID')
 geeklist = GeeklistScraper(int(GEEKLIST_ID))
+SHORTLIST_KEY_NAME = "SPIEL2025_SHORTLIST"
 
 
 @app.route('/')
@@ -21,29 +22,29 @@ def home():
 def shortlist_action(username: str):
     action = request.form.get('action')
     game_id = request.form.get('game_id')
-    shortlist = load_from_redis(f'SPIEL2024_SHORTLIST_{username}')
+    shortlist = load_from_redis(f'{SHORTLIST_KEY_NAME}_{username}')
     if action == 'add':
         shortlist = f'{shortlist};{game_id}'
     if action == 'remove':
         shortlist = shortlist.split(';')
         shortlist.remove(str(game_id))
         shortlist = ';'.join(shortlist)
-    write_to_redis(f'SPIEL2024_SHORTLIST_{username}', shortlist)
+    write_to_redis(f'{SHORTLIST_KEY_NAME}_{username}', shortlist)
     return '', 200
 
 
 @app.post('/add_to_shortlist/<username>')
 def add_to_shortlist(username: str):
     game_id = request.form.get('game_id')
-    shortlist = load_from_redis(f'SPIEL2024_SHORTLIST_{username}')
+    shortlist = load_from_redis(f'{SHORTLIST_KEY_NAME}_{username}')
     shortlist = f'{shortlist};{game_id}'
-    write_to_redis(f'SPIEL2024_SHORTLIST_{username}', json.dumps(shortlist))
+    write_to_redis(f'{SHORTLIST_KEY_NAME}_{username}', json.dumps(shortlist))
     return render_template('index.html', geeklist_id=GEEKLIST_ID)
 
 
 @app.get('/load_shortlist/<username>')
 def load_shortlist(username: str):
-    shortlist = load_from_redis(f'SPIEL2024_SHORTLIST_{username}')
+    shortlist = load_from_redis(f'{SHORTLIST_KEY_NAME}_{username}')
     return jsonify({"shortlist": shortlist})
 
 
@@ -51,7 +52,7 @@ def load_shortlist(username: str):
 def serve_json(username: str):
     games = load_from_redis(f'games_{GEEKLIST_ID}')
 
-    shortlist = load_from_redis(f'SPIEL2024_SHORTLIST_{username}')
+    shortlist = load_from_redis(f'{SHORTLIST_KEY_NAME}_{username}')
     shortlist = shortlist.split(';') if shortlist else []
 
     today_tomorrow = request.args.get('todaytomorrow', False)

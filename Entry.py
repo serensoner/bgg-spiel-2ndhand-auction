@@ -22,6 +22,8 @@ REGEXES = {
 
 
 def remove_tag(text: str, tag: str) -> str:
+    if not text:
+        return ""
     start_tag_loc = text.find(f'[{tag}]')
     if start_tag_loc == -1:
         return text

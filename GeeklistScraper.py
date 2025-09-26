@@ -52,7 +52,7 @@ class GeeklistScraper:
             messages = '\n'.join([e.get_message(type_='discord') for e in self.send_list])
             send_discord_message(messages)
 
-        if self.send_list and DISCORD_URL:
+        if self.send_list and SLACK_URL:
             messages = '\n'.join([e.get_message(type_='slack') for e in self.send_list])
             send_slack_message(messages)
 
@@ -106,8 +106,8 @@ class GeeklistScraper:
             'body_raw': item_['body'],
             'body_text': BeautifulSoup(
                 bbcode.render_html(item_['body']), features='html.parser'
-            ).get_text(),
-            'body': bbcode.render_html(item_['body']),
+            ).get_text() if item_["body"] else "",
+            'body': bbcode.render_html(item_['body']) if item_["body"] else "",
             'comments_raw': comments,
         }
         entry = Entry(**item_)
