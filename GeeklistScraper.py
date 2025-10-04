@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from Entry import Entry
 import logging
 
-from redis_helper import load_from_redis, write_to_redis
+from redis_helper import load_from_redis, write_to_redis, write_to_disk, read_from_disk
 from text_utils import send_slack_message, send_discord_message, DISCORD_URL, SLACK_URL
 
 log = logging.getLogger('werkzeug')
@@ -29,10 +29,11 @@ class GeeklistScraper:
         if force_scrape:
             self.parse_all()
         else:
-            entries = load_from_redis(self.key)
-            self.entries = {str(e['id_']): Entry(
-                **{**e, **{'is_parsed': True}}
-            ) for e in entries}
+            entries = read_from_disk(self.key)
+            if entries:
+                self.entries = {str(e['id_']): Entry(
+                    **{**e, **{'is_parsed': True}}
+                ) for e in entries}
 
     def parse_all(self):
         self.send_list = []
@@ -63,7 +64,7 @@ class GeeklistScraper:
                 self.entries[k] = entry
 
         entry_json = list(self.entries.values())
-        write_to_redis(self.key_full, [
+        write_to_disk(self.key_full, [
             {k: v for k, v in entry.__dict__.items()}
             for entry in entry_json
         ])
@@ -72,7 +73,7 @@ class GeeklistScraper:
             'body_cleaned', 'body_raw', 'auction_end', 'auction_end_str',
             'body_text', 'comments', 'comments_raw', 'bids', 'condition'
         ]
-        write_to_redis(self.key, [
+        write_to_disk(self.key, [
             {k: v for k, v in entry.__dict__.items() if k not in skipped_keys}
             for entry in entry_json
         ])

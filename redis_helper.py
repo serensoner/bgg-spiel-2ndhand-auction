@@ -1,6 +1,8 @@
 import json
 import os
 import pickle
+from pathlib import Path
+
 import redis
 
 conn_pool = redis.ConnectionPool(
@@ -10,6 +12,21 @@ conn_pool = redis.ConnectionPool(
     port=os.getenv('REDIS_PORT'),
     connection_class=redis.SSLConnection
 )
+
+ROOT_PATH = Path("data/")
+
+
+def write_to_disk(key: str, value):
+    with open(str(ROOT_PATH / key), "wb+") as f:
+        pickle.dump(value, f)
+
+
+def read_from_disk(key: str):
+    try:
+        with open(str(ROOT_PATH / key), "rb+") as f:
+            return pickle.load(f)
+    except:
+        return None
 
 
 def write_to_redis(key: str, value):

@@ -140,27 +140,80 @@
             }
         },
         initComplete: function () {
-            this.api()
-                .columns([2, 5, 6])
-                .every(function () {
-                    let column = this;
-                    let title = column.header().textContent;
+            const api = this.api();
 
-                    // Create input element
-                    let input = document.createElement('input');
-                    input.placeholder = title;
-                    input.className = "form-control";
-                    column.header().replaceChildren(input);
+            // --- your column header filters ---
+            api.columns([2, 5, 6]).every(function () {
+                let column = this;
+                let title = column.header().textContent;
 
-                    // Event listener for user input
-                    input.addEventListener('keyup', () => {
-                        if (column.search() !== this.value) {
-                            column.search(input.value).draw();
-                        }
-                    });
+                let input = document.createElement('input');
+                input.placeholder = title;
+                input.className = "form-control";
+                column.header().replaceChildren(input);
+
+                input.addEventListener('keyup', () => {
+                    if (column.search() !== input.value) {
+                        column.search(input.value).draw();
+                    }
                 });
-            },
-         });
+            });
+
+            // --- Go to page control ---
+            const info = api.page.info();
+            const container = api.table().container();       // DataTables wrapper
+            const controls = document.createElement('div');
+            controls.style.display = 'flex';
+            controls.style.alignItems = 'center';
+            controls.style.gap = '0.5rem';
+            controls.style.margin = '0.5rem 0';
+
+            const label = document.createElement('span');
+            label.textContent = 'Go to page:';
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = 1;
+            input.step = 1;
+            input.value = info.page + 1;                     // show current (1-based)
+            input.style.width = '6rem';
+
+            const of = document.createElement('span');
+            of.textContent = `of ${info.pages}`;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = 'Go';
+
+            function goToPage() {
+                const val = parseInt(input.value, 10);
+                if (Number.isFinite(val)) {
+                    const pages = api.page.info().pages;
+                    const clamped = Math.max(1, Math.min(val, pages));
+                    api.page(clamped - 1).draw(false);       // API is 0-based
+                    input.value = clamped;                   // normalize if out of range
+                }
+            }
+
+            btn.addEventListener('click', goToPage);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') goToPage();
+            });
+
+            // keep "of N" and value in sync if data/filtering changes
+            api.on('draw', () => {
+                const i = api.page.info();
+                of.textContent = `of ${i.pages}`;
+                input.value = i.page + 1;
+            });
+
+            controls.append(label, input, of, btn);
+
+            // place it near the existing pagination
+            const paginate = container.querySelector('.dataTables_paginate') || container;
+            paginate.parentNode.insertBefore(controls, paginate);
+        },
+        });
 
         const hide_sold_checkbox = document.getElementById('form-check-sold')
 
